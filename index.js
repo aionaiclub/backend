@@ -22,7 +22,7 @@ const User = require('./models/User');
 // Connect to database
 connectDB().then(async () => {
   try {
-    const adminExists = await User.findOne({ email: 'superadmin@aionai.com' });
+    const adminExists = await User.findOne({ role: 'superadmin' });
     if (!adminExists) {
       await User.create({
         name: 'Super Admin',
@@ -30,9 +30,7 @@ connectDB().then(async () => {
         password: 'superadmin123',
         role: 'superadmin',
       });
-      console.log('✅ Super Admin auto-initialized: superadmin@aionai.com / superadmin123');
-    } else {
-      console.log('ℹ️ Super Admin account already exists');
+      console.log('✅ Super Admin auto-initialized');
     }
   } catch (error) {
     console.error('❌ Super Admin initialization failed:', error.message);
@@ -46,11 +44,12 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
+  "https://frontend-j4l1.onrender.com",
   process.env.FRONTEND_URL // To be set in production
 ].filter(Boolean);
-
+//ssss
 app.use(cors({
-  origin: function(origin, callback) {
+  origin: function (origin, callback) {
     if (!origin || allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
       callback(null, true);
     } else {
@@ -87,7 +86,7 @@ if (process.env.NODE_ENV === 'production') {
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: function(origin, callback) {
+    origin: function (origin, callback) {
       if (!origin || allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
         callback(null, true);
       } else {
