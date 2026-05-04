@@ -22,7 +22,7 @@ const User = require('./models/User');
 // Connect to database
 connectDB().then(async () => {
   try {
-    const adminExists = await User.findOne({ role: 'superadmin' });
+    const adminExists = await User.findOne({ email: 'superadmin@aionai.com' });
     if (!adminExists) {
       await User.create({
         name: 'Super Admin',
@@ -30,7 +30,9 @@ connectDB().then(async () => {
         password: 'superadmin123',
         role: 'superadmin',
       });
-      console.log('✅ Super Admin auto-initialized');
+      console.log('✅ Super Admin auto-initialized: superadmin@aionai.com / superadmin123');
+    } else {
+      console.log('ℹ️ Super Admin account already exists');
     }
   } catch (error) {
     console.error('❌ Super Admin initialization failed:', error.message);
