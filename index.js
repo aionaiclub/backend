@@ -17,8 +17,25 @@ const registrationRoutes = require('./routes/registrationRoutes');
 // Load env vars
 dotenv.config({ override: true });
 
+const User = require('./models/User');
+
 // Connect to database
-connectDB();
+connectDB().then(async () => {
+  try {
+    const adminExists = await User.findOne({ role: 'superadmin' });
+    if (!adminExists) {
+      await User.create({
+        name: 'Super Admin',
+        email: 'superadmin@aionai.com',
+        password: 'superadmin123',
+        role: 'superadmin',
+      });
+      console.log('✅ Super Admin auto-initialized');
+    }
+  } catch (error) {
+    console.error('❌ Super Admin initialization failed:', error.message);
+  }
+});
 
 const app = express();
 
@@ -56,10 +73,9 @@ app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
 // Production setup for static serving
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
-  app.get(/.*/, (req, res) => 
-    res.sendFile(path.resolve(__dirname, '..', 'frontend', 'dist', 'index.html'))
-  );
+  app.get('/', (req, res) => {
+    res.send('AIONAI API is running and MongoDB is connected.');
+  });
 } else {
   app.get('/', (req, res) => {
     res.send('AIONAI API is running...');
